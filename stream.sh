@@ -1,7 +1,29 @@
 #!/bin/bash
 
-# Extract the direct video URL from the YouTube Shorts video
-VIDEO_URL_EXTRACTED=$(yt-dlp -g "$VIDEO_URL")
+# Check if the VIDEO_URL is empty
+if [ -z "$VIDEO_URL" ]; then
+  echo "Error: VIDEO_URL is not set. Please provide a valid URL."
+  exit 1
+fi
 
-# Use FFmpeg to stream the video to YouTube (replace YOUR_STREAM_KEY with the environment variable)
-ffmpeg -i "$VIDEO_URL_EXTRACTED" -c:v libx264 -preset ultrafast -b:v 1500k -maxrate 1500k -bufsize 3000k -pix_fmt yuv420p -f flv "rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY"
+# Check if the STREAM_KEY is empty
+if [ -z "$STREAM_KEY" ]; then
+  echo "Error: STREAM_KEY is not set. Please provide a valid stream key."
+  exit 1
+fi
+
+# Use yt-dlp to download the video in the best available quality
+echo "Downloading video from YouTube..."
+yt-dlp -f bestvideo+bestaudio --merge-output-format mp4 "$VIDEO_URL" -o /app/video.mp4
+
+# Check if the video download was successful
+if [ ! -f /app/video.mp4 ]; then
+  echo "Error: Failed to download the video."
+  exit 1
+fi
+
+# Stream the downloaded video to YouTube using ffmpeg
+echo "Starting the stream to YouTube..."
+ffmpeg -re -i /app/video.mp4 -f flv "rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY"
+
+echo "Stream ended."
