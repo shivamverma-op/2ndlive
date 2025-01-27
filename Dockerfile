@@ -1,27 +1,31 @@
-# Use an official Ubuntu as a parent image
+# Use a base image with ffmpeg and other dependencies
 FROM ubuntu:20.04
 
-# Set environment variables to avoid interactive prompts during installation
+# Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
+ENV VIDEO_URL="https://www.youtube.com/watch?v=c9GjnPzBPvY"  
+ENV STREAM_KEY="gmbe-y8pu-jts8-h394-8uu6" 
 
-# Install FFmpeg and yt-dlp (for YouTube video URL extraction)
-RUN apt-get update && apt-get install -y \
+# Install necessary dependencies
+RUN apt-get update && \
+    apt-get install -y \
     ffmpeg \
+    curl \
+    bash \
     python3-pip \
-    && pip3 install -U yt-dlp \
     && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory inside the container
+# Install yt-dlp (youtube-dl replacement)
+RUN pip3 install -U yt-dlp
+
+# Create a directory for the video
 WORKDIR /app
 
-# Copy your script to the container
-COPY stream.sh /app/
+# Copy the stream.sh script into the container
+COPY stream.sh /app/stream.sh
 
-# Make the script executable
+# Give execute permissions to the script
 RUN chmod +x /app/stream.sh
 
-# Define environment variables for YouTube stream key and video URL
-ENV STREAM_KEY="gmbe-y8pu-jts8-h394-8uu6"
-ENV VIDEO_URL="https://www.youtube.com/watch?v=c9GjnPzBPvY"
-# Execute the script when the container starts
+# Set the default command to run the script
 CMD ["/bin/bash", "/app/stream.sh"]
