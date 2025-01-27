@@ -1,14 +1,28 @@
-# Start with a base image
+# Use an official Ubuntu as a parent image
 FROM ubuntu:20.04
 
-# Install FFmpeg
-RUN apt-get update && apt-get install -y ffmpeg
+# Set environment variables to avoid interactive prompts during installation
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Copy the vertical video file
-COPY your_video.mp4 /app/your_video.mp4
+# Install FFmpeg and yt-dlp (for YouTube video URL extraction)
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    python3-pip \
+    && pip3 install -U yt-dlp \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Run FFmpeg to stream to YouTube
-CMD ["ffmpeg", "-re", "-stream_loop", "-1", "-i", "/app/your_video.mp4", "-vf", "scale=1080:1920", "-c:v", "libx264", "-preset", "ultrafast", "-b:v", "1500k", "-maxrate", "1500k", "-bufsize", "3000k", "-pix_fmt", "yuv420p", "-f", "flv", "rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY"]
+# Copy your script to the container
+COPY stream.sh /app/
+
+# Make the script executable
+RUN chmod +x /app/stream.sh
+
+# Define environment variables for YouTube stream key and video URL
+ENV STREAM_KEY="your_youtube_stream_key"
+ENV VIDEO_URL="https://youtube.com/shorts/c9GjnPzBPvY?si=5aTFFzWhueenG8My"  # Your YouTube video URL
+
+# Execute the script when the container starts
+CMD ["/bin/bash", "/app/stream.sh"]
