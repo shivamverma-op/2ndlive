@@ -22,6 +22,6 @@ RUN chmod +x /app/stream.sh
 
 # Define environment variables for YouTube stream key and video URL
 ENV STREAM_KEY="gmbe-y8pu-jts8-h394-8uu6"
-ENV VIDEO_URL="https://youtube.com/shorts/c9GjnPzBPvY?si=5aTFFzWhueenG8My"
+ENV VIDEO_URL="https://www.youtube.com/watch?v=c9GjnPzBPvY"
 # Execute the script when the container starts
 CMD ["/bin/bash", "/app/stream.sh"]
