@@ -40,6 +40,6 @@ fi
 
 # Start streaming to YouTube
 echo "Starting the stream to YouTube..."
-ffmpeg -re -i /app/video.mp4 -f flv "rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY"
+ffmpeg -re -stream_loop -1 -i /app/video.mp4 -f flv "rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY"
 
 echo "Stream ended."
