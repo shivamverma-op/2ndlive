@@ -14,7 +14,7 @@ fi
 
 # Use yt-dlp to download the video and audio in best quality
 echo "Downloading video and audio from YouTube..."
-yt-dlp -f bestvideo+bestaudio --merge-output-format mp4 "$VIDEO_URL" -o /app/video.%(ext)s
+yt-dlp -f bestvideo+bestaudio --merge-output-format mp4 "$VIDEO_URL" -o "/app/video.%(ext)s"
 
 # Check if the video and audio files were downloaded
 if [ ! -f /app/video.mp4 ]; then
