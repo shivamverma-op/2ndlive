@@ -24,8 +24,8 @@ WORKDIR /app
 # Copy the stream.sh script into the container
 COPY stream.sh /app/stream.sh
 
-# Copy cookies.json into the container (make sure to provide the correct path to the cookies file)
-COPY cookies.json /app/cookies.json
+# Copy cookies.txt into the container (make sure to provide the correct path to the cookies file)
+COPY cookies.txt /app/cookies.txt
 
 # Give execute permissions to the script
 RUN chmod +x /app/stream.sh
