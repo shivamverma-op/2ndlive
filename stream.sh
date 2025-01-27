@@ -12,17 +12,28 @@ if [ -z "$STREAM_KEY" ]; then
   exit 1
 fi
 
-# Use yt-dlp to download the video in the best available quality
-echo "Downloading video from YouTube..."
-yt-dlp -f bestvideo+bestaudio --merge-output-format mp4 "$VIDEO_URL" -o /app/video.mp4
+# Use yt-dlp to download the video and audio in best quality
+echo "Downloading video and audio from YouTube..."
+yt-dlp -f bestvideo+bestaudio --merge-output-format mp4 "$VIDEO_URL" -o /app/video.%(ext)s
 
-# Check if the video download was successful
+# Check if the video and audio files were downloaded
 if [ ! -f /app/video.mp4 ]; then
   echo "Error: Failed to download the video."
   exit 1
 fi
 
-# Stream the downloaded video to YouTube using ffmpeg
+# If the download is in separate video and audio streams, try to merge them
+if [ -f /app/video.f* ]; then
+  echo "Merging video and audio streams..."
+  ffmpeg -i /app/video.f* -c:v copy -c:a aac -strict experimental /app/video.mp4
+  # Check if merging was successful
+  if [ ! -f /app/video.mp4 ]; then
+    echo "Error: Failed to merge video and audio streams."
+    exit 1
+  fi
+fi
+
+# Stream the video to YouTube using ffmpeg
 echo "Starting the stream to YouTube..."
 ffmpeg -re -i /app/video.mp4 -f flv "rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY"
 
